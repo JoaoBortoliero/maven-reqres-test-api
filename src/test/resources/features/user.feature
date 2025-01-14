@@ -44,5 +44,23 @@ Feature: Realizar cadastro de usuario
     Then informa falha na operacao
 
     Examples:
-      | email  |
+      | email |
       | "peter@klaven" |
+
+  Scenario Outline: CT006_Validar lista usuario por id com sucesso
+    Given usuario com identificador <id>
+    When realizo requisicao
+    Then mostra usuario com identificador <id>
+
+    Examples:
+      | id |
+      |  2 |
+
+  Scenario Outline: CT007_Validar lista usuario por id sem sucesso
+    Given usuario com identificador <id>
+    When realizo requisicao
+    Then mostra usuario com id:<id>
+
+    Examples:
+      | id |
+      |  1098 |

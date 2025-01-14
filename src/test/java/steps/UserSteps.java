@@ -5,16 +5,19 @@ import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.Before;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import base.Base;
 import page.UserPage;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.*;
 
 public class UserSteps extends Base {
@@ -22,7 +25,12 @@ public class UserSteps extends Base {
     private HashMap<String, String> user;
     private Response response;
     private String operation;
-    private Base base;
+    private final Base base;
+
+    private RequestSpecification requestSpecification;
+
+//    private static final String LISTA_USUARIO_ENDPOINT = "/users/{id}";
+
 
     public UserSteps() {
         base = new Base();
@@ -33,16 +41,27 @@ public class UserSteps extends Base {
         base.setUp();
     }
 
+    // Melhorar, isso ta muito ruim!!
     @When("realizo requisicao")
-    public void realizo_requisicao() {
-        try {
-            response = given().
-                            body(user).
-                       when().
-                            post(UserPage.defineEndpoint(operation));
-        } catch (Exception e) {
-            System.err.println("Erro durante a requisição: " + e.getMessage());
-            throw new RuntimeException("Falha na requisição: " + e.getMessage(), e);
+    public void realizoRequisicao() throws Exception {
+        if (Objects.equals(operation, "lista por id")) {
+            try {
+                response = requestSpecification.when().
+                                                    get(UserPage.defineEndpoint(operation));
+            } catch (Exception e) {
+                System.err.println("Erro durante a requisição: " + e.getMessage());
+                throw new Exception("Falha na requisição: " + e.getMessage(), e);
+            }
+        } else {
+            try {
+                response = given().
+                                body(user).
+                            when().
+                                post(UserPage.defineEndpoint(operation));
+            } catch (Exception e) {
+                System.err.println("Erro durante a requisição: " + e.getMessage());
+                throw new Exception("Falha na requisição: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -55,7 +74,7 @@ public class UserSteps extends Base {
 
     // Tentar criar uma função que cria um hash map com os parametros recebidos para ser utilizado no passo de criação e registro de usuário
     @Given("crio usuario com {string} e {string}")
-    public void crio_usuario_com(String name, String job) {
+    public void crioUsuarioCom(String name, String job) {
         try {
             user = new HashMap<>();
             user.put("name", name);
@@ -68,14 +87,14 @@ public class UserSteps extends Base {
     }
 
     @Then("informa sucesso na criacao")
-    public void informa_sucesso_na_criacao() {
+    public void informaSucessoNaCriacao() {
         response.then().
                 statusCode(HttpStatus.SC_CREATED).
                 body("createdAt", notNullValue());
     }
 
     @Given("registro usuario com {string} e {string}")
-    public void registro_usuario_com(String email, String password) {
+    public void registroUsuarioCom(String email, String password) {
         try {
             user = new HashMap<>();
             user.put("email", email);
@@ -88,7 +107,7 @@ public class UserSteps extends Base {
     }
 
     @Then("informa sucesso no registro")
-    public void informa_sucesso_no_registro() {
+    public void informaSucessoNoRegistro() {
         response.then().
                     statusCode(HttpStatus.SC_OK).
                     body("$", hasKey("token")).
@@ -96,7 +115,7 @@ public class UserSteps extends Base {
     }
 
     @Given("registro usuario com {string}")
-    public void registro_usuario_com(String email) {
+    public void registroUsuarioCom(String email) {
         try {
             user = new HashMap<>();
             user.put("email", email);
@@ -115,7 +134,7 @@ public class UserSteps extends Base {
 //    }
 
     @Given("login usuario com {string} e {string}")
-    public void login_usuario_com(String email, String password) {
+    public void loginUsuarioCom(String email, String password) {
        try {
            user = new HashMap<>();
            user.put("email", email);
@@ -129,7 +148,7 @@ public class UserSteps extends Base {
     }
 
     @Then("informa sucesso no login")
-    public void informa_sucesso_no_login() {
+    public void informaSucessoNoLogin() {
         response.then().
                     statusCode(HttpStatus.SC_OK).
                     body("$", hasKey("token")).
@@ -137,7 +156,7 @@ public class UserSteps extends Base {
     }
 
     @Given("login usuario com {string}")
-    public void login_usuario_com(String email) {
+    public void loginUsuarioCom(String email) {
         try {
             user = new HashMap<>();
             user.put("email", email);
@@ -150,10 +169,31 @@ public class UserSteps extends Base {
     }
 
     @Then("informa falha na operacao")
-    public void informa_falha_na_operacao() {
+    public void informaFalhaNaOperacao() {
         response.then().
                 statusCode(HttpStatus.SC_BAD_REQUEST).
                 body("error", is("Missing password"));
+    }
+
+    @Given("usuario com identificador {int}")
+    public void usuarioComIdentificador(int id) {
+        try {
+            requestSpecification = given().
+                                        pathParam("userId", id);
+
+            operation = "lista por id";
+        } catch (Exception e) {
+            System.err.println("Erro ao listar usuário por id: " + e.getMessage());
+            throw new RuntimeException("Falha ao listar usuário por id", e);
+        }
+    }
+
+    @Then("mostra usuario com identificador {int}")
+    public void mostraUsuarioComIdentificadorId(int id) {
+        response.then().
+                    statusCode(HttpStatus.SC_OK).
+                    body("data", hasKey("id")).
+                    body("data.id", equalTo(id));
     }
 
 }
