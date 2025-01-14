@@ -1,6 +1,7 @@
+@run
 Feature: Realizar cadastro de usuario
 
-  @CP001
+@CP001
   Scenario Outline: CT001_Validar criacao de usuario com sucesso
     Given crio usuario com <name> e <job>
     When realizo requisicao
@@ -8,7 +9,7 @@ Feature: Realizar cadastro de usuario
 
     Examples:
       | name  | job  |
-      | "Joao" | "QA" |
+      | "morpheus" | "leader" |
 
   Scenario Outline: CT002_Validar registro de usuario com sucesso
     Given registro usuario com <email> e <password>
@@ -17,16 +18,16 @@ Feature: Realizar cadastro de usuario
 
     Examples:
       | email  | password  |
-      | "joao@reqres.in" | "senha123" |
+      | "eve.holt@reqres.in" | "pistol" |
 
   Scenario Outline: CT003_Validar registro de usuario sem sucesso
     Given registro usuario com <email>
     When realizo requisicao
-    Then informa falha no registro
+    Then informa falha na operacao
 
     Examples:
       | email  |
-      | "joao@reqres.in" |
+      | "sydney@fife" |
 
   Scenario Outline: CT004_Validar login com sucesso
     Given login usuario com <email> e <password>
@@ -35,13 +36,13 @@ Feature: Realizar cadastro de usuario
 
     Examples:
       | email  | password  |
-      | "joao@reqres.in" | "senha123" |
+      | "eve.holt@reqres.in" | "cityslicka" |
 
   Scenario Outline: CT005_Validar login sem sucesso
     Given login usuario com <email>
     When realizo requisicao
-    Then informa falha no login
+    Then informa falha na operacao
 
     Examples:
       | email  |
-      | "joao@reqres.in" |
+      | "peter@klaven" |
