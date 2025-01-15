@@ -59,7 +59,7 @@ Feature: Realizar cadastro de usuario
   Scenario Outline: CT007_Validar lista usuario por id sem sucesso
     Given usuario com identificador <id>
     When realizo requisicao
-    Then mostra usuario com id:<id>
+    Then nao localiza usuario
 
     Examples:
       | id |

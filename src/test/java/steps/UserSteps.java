@@ -7,6 +7,7 @@ import io.cucumber.java.Before;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import models.User;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import page.UserPage;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class UserSteps extends Base {
@@ -47,7 +49,7 @@ public class UserSteps extends Base {
         if (Objects.equals(operation, "lista por id")) {
             try {
                 response = requestSpecification.when().
-                                                    get(UserPage.defineEndpoint(operation));
+                    get(UserPage.defineEndpoint(operation));
             } catch (Exception e) {
                 System.err.println("Erro durante a requisição: " + e.getMessage());
                 throw new Exception("Falha na requisição: " + e.getMessage(), e);
@@ -55,9 +57,9 @@ public class UserSteps extends Base {
         } else {
             try {
                 response = given().
-                                body(user).
-                            when().
-                                post(UserPage.defineEndpoint(operation));
+                    body(user).
+                when().
+                    post(UserPage.defineEndpoint(operation));
             } catch (Exception e) {
                 System.err.println("Erro durante a requisição: " + e.getMessage());
                 throw new Exception("Falha na requisição: " + e.getMessage(), e);
@@ -89,8 +91,8 @@ public class UserSteps extends Base {
     @Then("informa sucesso na criacao")
     public void informaSucessoNaCriacao() {
         response.then().
-                statusCode(HttpStatus.SC_CREATED).
-                body("createdAt", notNullValue());
+            statusCode(HttpStatus.SC_CREATED).
+            body("createdAt", notNullValue());
     }
 
     @Given("registro usuario com {string} e {string}")
@@ -109,9 +111,9 @@ public class UserSteps extends Base {
     @Then("informa sucesso no registro")
     public void informaSucessoNoRegistro() {
         response.then().
-                    statusCode(HttpStatus.SC_OK).
-                    body("$", hasKey("token")).
-                    body("token", notNullValue());
+            statusCode(HttpStatus.SC_OK).
+            body("$", hasKey("token")).
+            body("token", notNullValue());
     }
 
     @Given("registro usuario com {string}")
@@ -125,13 +127,6 @@ public class UserSteps extends Base {
             throw new RuntimeException("Falha ao registrar usuário", e);
         }
     }
-
-//    @Then("informa falha na operacao")
-//    public void informa_falha_na_operacao() {
-//        response.then().
-//                statusCode(HttpStatus.SC_BAD_REQUEST).
-//                body("error", is("Missing password"));
-//    }
 
     @Given("login usuario com {string} e {string}")
     public void loginUsuarioCom(String email, String password) {
@@ -150,9 +145,9 @@ public class UserSteps extends Base {
     @Then("informa sucesso no login")
     public void informaSucessoNoLogin() {
         response.then().
-                    statusCode(HttpStatus.SC_OK).
-                    body("$", hasKey("token")).
-                    body("token", notNullValue());
+            statusCode(HttpStatus.SC_OK).
+            body("$", hasKey("token")).
+            body("token", notNullValue());
     }
 
     @Given("login usuario com {string}")
@@ -171,15 +166,15 @@ public class UserSteps extends Base {
     @Then("informa falha na operacao")
     public void informaFalhaNaOperacao() {
         response.then().
-                statusCode(HttpStatus.SC_BAD_REQUEST).
-                body("error", is("Missing password"));
+            statusCode(HttpStatus.SC_BAD_REQUEST).
+            body("error", is("Missing password"));
     }
 
     @Given("usuario com identificador {int}")
     public void usuarioComIdentificador(int id) {
         try {
             requestSpecification = given().
-                                        pathParam("userId", id);
+                pathParam("userId", id);
 
             operation = "lista por id";
         } catch (Exception e) {
@@ -190,10 +185,23 @@ public class UserSteps extends Base {
 
     @Then("mostra usuario com identificador {int}")
     public void mostraUsuarioComIdentificadorId(int id) {
-        response.then().
-                    statusCode(HttpStatus.SC_OK).
-                    body("data", hasKey("id")).
-                    body("data.id", equalTo(id));
+        User user = response.then().
+            statusCode(HttpStatus.SC_OK).
+        extract().
+            body().jsonPath().getObject("data", User.class);
+
+        assertThat(user.getId(), is(id));
+        assertThat(user.getFirstName(), is("Janet"));
+        assertThat(user.getLastName(), is("Weaver"));
+        assertThat(user.getEmail(), containsString("@reqres.in"));
     }
 
+    @Then("nao localiza usuario")
+    public void naoLocalizaUsuario() {
+        response.then().
+            statusCode(HttpStatus.SC_NOT_FOUND).
+            body(is("{}"));
+    }
+
+    // Comparar o json de retorno com o json modelo
 }

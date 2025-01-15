@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
+    private int id;
     @JsonAlias("first_name")
     private String firstName;
     @JsonAlias("last_name")
