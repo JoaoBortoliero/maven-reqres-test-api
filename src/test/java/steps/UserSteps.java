@@ -1,24 +1,20 @@
 package steps;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
+import base.Base;
 import io.cucumber.java.Before;
-
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import models.User;
 import org.apache.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import base.Base;
 import page.UserPage;
 
+import java.util.HashMap;
+import java.util.Objects;
+
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -31,9 +27,6 @@ public class UserSteps extends Base {
 
     private RequestSpecification requestSpecification;
 
-//    private static final String LISTA_USUARIO_ENDPOINT = "/users/{id}";
-
-
     public UserSteps() {
         base = new Base();
     }
@@ -43,38 +36,24 @@ public class UserSteps extends Base {
         base.setUp();
     }
 
-    // Melhorar, isso ta muito ruim!!
     @When("realizo requisicao")
     public void realizoRequisicao() throws Exception {
-        if (Objects.equals(operation, "lista por id")) {
-            try {
+        try {
+            if (Objects.equals(operation, "lista por id")) {
                 response = requestSpecification.when().
                     get(UserPage.defineEndpoint(operation));
-            } catch (Exception e) {
-                System.err.println("Erro durante a requisição: " + e.getMessage());
-                throw new Exception("Falha na requisição: " + e.getMessage(), e);
-            }
-        } else {
-            try {
+            } else {
                 response = given().
                     body(user).
                 when().
                     post(UserPage.defineEndpoint(operation));
-            } catch (Exception e) {
-                System.err.println("Erro durante a requisição: " + e.getMessage());
-                throw new Exception("Falha na requisição: " + e.getMessage(), e);
             }
+        } catch (Exception e) {
+            System.err.println("Erro durante a requisição: " + e.getMessage());
+            throw new Exception("Falha na requisição: " + e.getMessage(), e);
         }
     }
 
-//    public HashMap criaHashMap(String key1, String key2, String value1, String value2) {
-//        HashMap<String, String> data = new HashMap<>();
-//        data.put(key1, value1);
-//        data.put(key1, value2);
-//        return data;
-//    }
-
-    // Tentar criar uma função que cria um hash map com os parametros recebidos para ser utilizado no passo de criação e registro de usuário
     @Given("crio usuario com {string} e {string}")
     public void crioUsuarioCom(String name, String job) {
         try {
@@ -202,6 +181,4 @@ public class UserSteps extends Base {
             statusCode(HttpStatus.SC_NOT_FOUND).
             body(is("{}"));
     }
-
-    // Comparar o json de retorno com o json modelo
 }

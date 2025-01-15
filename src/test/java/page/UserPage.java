@@ -3,18 +3,13 @@ package page;
 import lombok.*;
 
 @Data
-//@AllArgsConstructor
-//@NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserPage {
     private static final String CRIA_USUARIO_ENDPOINT = "/users";
     private static final String REGISTRA_USUARIO_ENDPOINT = "/register";
     private static final String LOGIN_USUARIO_ENDPOINT = "/login";
-//    @Getter
-////    @Setter
     private static final String LISTA_USUARIO_ENDPOINT = "/users/{userId}";
-
-    public UserPage() {
-    }
 
     public static String defineEndpoint(String operation) {
         return switch (operation) {
