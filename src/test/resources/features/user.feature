@@ -1,5 +1,5 @@
 @run
-Feature: Realizar cadastro de usuario
+Feature: Gerenciamento de usuários
 
 @CP001
   Scenario Outline: CT001_Validar criacao de usuario com sucesso
@@ -47,7 +47,7 @@ Feature: Realizar cadastro de usuario
       | email |
       | "peter@klaven" |
 
-  Scenario Outline: CT006_Validar lista usuario por id com sucesso
+  Scenario Outline: CT006_Validar busca usuario por id com sucesso
     Given usuario com identificador <id>
     When realizo requisicao
     Then mostra usuario com identificador <id>
@@ -56,7 +56,7 @@ Feature: Realizar cadastro de usuario
       | id |
       |  2 |
 
-  Scenario Outline: CT007_Validar lista usuario por id sem sucesso
+  Scenario Outline: CT007_Validar busca usuario por id sem sucesso
     Given usuario com identificador <id>
     When realizo requisicao
     Then nao localiza usuario
