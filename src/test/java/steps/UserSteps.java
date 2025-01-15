@@ -1,24 +1,20 @@
 package steps;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
+import base.Base;
 import io.cucumber.java.Before;
-
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import models.User;
 import org.apache.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import base.Base;
 import page.UserPage;
 
+import java.util.HashMap;
+import java.util.Objects;
+
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -31,9 +27,6 @@ public class UserSteps extends Base {
 
     private RequestSpecification requestSpecification;
 
-//    private static final String LISTA_USUARIO_ENDPOINT = "/users/{id}";
-
-
     public UserSteps() {
         base = new Base();
     }
@@ -43,27 +36,21 @@ public class UserSteps extends Base {
         base.setUp();
     }
 
-    // Melhorar, isso ta muito ruim!!
     @When("realizo requisicao")
     public void realizoRequisicao() throws Exception {
-        if (Objects.equals(operation, "lista por id")) {
-            try {
+        try {
+            if (Objects.equals(operation, "lista por id")) {
                 response = requestSpecification.when().
                     get(UserPage.defineEndpoint(operation));
-            } catch (Exception e) {
-                System.err.println("Erro durante a requisição: " + e.getMessage());
-                throw new Exception("Falha na requisição: " + e.getMessage(), e);
-            }
-        } else {
-            try {
+            } else {
                 response = given().
                     body(user).
                 when().
                     post(UserPage.defineEndpoint(operation));
-            } catch (Exception e) {
-                System.err.println("Erro durante a requisição: " + e.getMessage());
-                throw new Exception("Falha na requisição: " + e.getMessage(), e);
             }
+        } catch (Exception e) {
+            System.err.println("Erro durante a requisição: " + e.getMessage());
+            throw new Exception("Falha na requisição: " + e.getMessage(), e);
         }
     }
 
