@@ -5,20 +5,20 @@ Feature: Gerenciamento de usuários
   Scenario Outline: CT001_Validar criacao de usuario com sucesso
     Given crio usuario com <name> e <job>
     When realizo requisicao
-    Then informa sucesso na criacao
+    Then informa sucesso na operacao <operation>
 
     Examples:
-      | name  | job  |
-      | "morpheus" | "leader" |
+      | name       | job      | operation |
+      | "morpheus" | "leader" | "create" |
 
   Scenario Outline: CT002_Validar registro de usuario com sucesso
     Given registro usuario com <email> e <password>
     When realizo requisicao
-    Then informa sucesso no registro
+    Then informa sucesso na operacao <operation>
 
     Examples:
-      | email  | password  |
-      | "eve.holt@reqres.in" | "pistol" |
+      | email                | password | operation   |
+      | "eve.holt@reqres.in" | "pistol" | "register" |
 
   Scenario Outline: CT003_Validar registro de usuario sem sucesso
     Given registro usuario com <email>
@@ -26,17 +26,17 @@ Feature: Gerenciamento de usuários
     Then informa falha na operacao
 
     Examples:
-      | email  |
+      | email         |
       | "sydney@fife" |
 
   Scenario Outline: CT004_Validar login com sucesso
     Given login usuario com <email> e <password>
     When realizo requisicao
-    Then informa sucesso no login
+    Then informa sucesso na operacao <operation>
 
     Examples:
-      | email  | password  |
-      | "eve.holt@reqres.in" | "cityslicka" |
+      | email                | password     | operation |
+      | "eve.holt@reqres.in" | "cityslicka" | "login"  |
 
   Scenario Outline: CT005_Validar login sem sucesso
     Given login usuario com <email>
@@ -44,7 +44,7 @@ Feature: Gerenciamento de usuários
     Then informa falha na operacao
 
     Examples:
-      | email |
+      | email          |
       | "peter@klaven" |
 
   Scenario Outline: CT006_Validar busca usuario por id com sucesso
@@ -54,7 +54,7 @@ Feature: Gerenciamento de usuários
 
     Examples:
       | id |
-      |  2 |
+      | 2  |
 
   Scenario Outline: CT007_Validar busca usuario por id sem sucesso
     Given usuario com identificador <id>
@@ -62,5 +62,5 @@ Feature: Gerenciamento de usuários
     Then nao localiza usuario
 
     Examples:
-      | id |
-      |  1098 |
+      | id   |
+      | 1098 |
