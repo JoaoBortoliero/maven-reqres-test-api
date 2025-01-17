@@ -36,24 +36,6 @@ public class UserSteps extends Base {
         base.setUp();
     }
 
-    @When("realizo requisicao")
-    public void realizoRequisicao() throws Exception {
-        try {
-            if (Objects.equals(operation, "lista por id")) {
-                response = requestSpecification.when().
-                    get(UserPage.defineEndpoint(operation));
-            } else {
-                response = given().
-                    body(user).
-                when().
-                    post(UserPage.defineEndpoint(operation));
-            }
-        } catch (Exception e) {
-            System.err.println("Erro durante a requisição: " + e.getMessage());
-            throw new Exception("Falha na requisição: " + e.getMessage(), e);
-        }
-    }
-
     @Given("crio usuario com {string} e {string}")
     public void crioUsuarioCom(String name, String job) {
         try {
@@ -67,13 +49,6 @@ public class UserSteps extends Base {
         }
     }
 
-    @Then("informa sucesso na criacao")
-    public void informaSucessoNaCriacao() {
-        response.then().
-            statusCode(HttpStatus.SC_CREATED).
-            body("createdAt", notNullValue());
-    }
-
     @Given("registro usuario com {string} e {string}")
     public void registroUsuarioCom(String email, String password) {
         try {
@@ -85,14 +60,6 @@ public class UserSteps extends Base {
             System.err.println("Erro ao registrar usuário: " + e.getMessage());
             throw new RuntimeException("Falha ao registrar usuário", e);
         }
-    }
-
-    @Then("informa sucesso no registro")
-    public void informaSucessoNoRegistro() {
-        response.then().
-            statusCode(HttpStatus.SC_OK).
-            body("$", hasKey("token")).
-            body("token", notNullValue());
     }
 
     @Given("registro usuario com {string}")
@@ -121,14 +88,6 @@ public class UserSteps extends Base {
 
     }
 
-    @Then("informa sucesso no login")
-    public void informaSucessoNoLogin() {
-        response.then().
-            statusCode(HttpStatus.SC_OK).
-            body("$", hasKey("token")).
-            body("token", notNullValue());
-    }
-
     @Given("login usuario com {string}")
     public void loginUsuarioCom(String email) {
         try {
@@ -140,13 +99,6 @@ public class UserSteps extends Base {
             throw new RuntimeException("Falha ao logar usuário", e);
         }
 
-    }
-
-    @Then("informa falha na operacao")
-    public void informaFalhaNaOperacao() {
-        response.then().
-            statusCode(HttpStatus.SC_BAD_REQUEST).
-            body("error", is("Missing password"));
     }
 
     @Given("usuario com identificador {int}")
@@ -163,7 +115,7 @@ public class UserSteps extends Base {
     }
 
     @Then("mostra usuario com identificador {int}")
-    public void mostraUsuarioComIdentificadorId(int id) {
+    public void mostraUsuarioComIdentificador(int id) {
         User user = response.then().
             statusCode(HttpStatus.SC_OK).
         extract().
@@ -180,5 +132,43 @@ public class UserSteps extends Base {
         response.then().
             statusCode(HttpStatus.SC_NOT_FOUND).
             body(is("{}"));
+    }
+
+    @When("realizo requisicao")
+    public void realizoRequisicao() throws Exception {
+        try {
+            if (Objects.equals(operation, "lista por id")) {
+                response = requestSpecification.when().
+                        get(UserPage.defineEndpoint(operation));
+            } else {
+                response = given().
+                        body(user).
+                        when().
+                        post(UserPage.defineEndpoint(operation));
+            }
+        } catch (Exception e) {
+            System.err.println("Erro durante a requisição: " + e.getMessage());
+            throw new Exception("Falha na requisição: " + e.getMessage(), e);
+        }
+    }
+
+    @Then("informa sucesso na operacao {string}")
+    public void informaSucessoNaOperacao(String operation) {
+        switch(operation){
+            case "create" -> response.then().
+                        statusCode(HttpStatus.SC_CREATED).
+                        body("createdAt", notNullValue());
+            case "register", "login" -> response.then().
+                        statusCode(HttpStatus.SC_OK).
+                        body("$", hasKey("token")).
+                        body("token", notNullValue());
+        }
+    }
+
+    @Then("informa falha na operacao")
+    public void informaFalhaNaOperacao() {
+        response.then().
+                statusCode(HttpStatus.SC_BAD_REQUEST).
+                body("error", is("Missing password"));
     }
 }
